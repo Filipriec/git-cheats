@@ -1,0 +1,37 @@
+code.farmeris.sk {
+    root * /app/vycba
+    
+    # Enable file browsing with custom sorting
+    file_server browse {
+        # Sort directories first, then by name
+        sort {
+            by name
+            dir_first
+        }
+    }
+
+    # Handle Markdown files
+    @markdown {
+        path_regexp markdown \.md$
+    }
+    
+    # Remove .md extension from URLs
+    handle @markdown {
+        rewrite * {path}
+    }
+
+    # Serve Markdown files with proper content type and styling
+    handle {
+        encode gzip
+        
+        # Try serving without .md extension first
+        try_files {path}.md {path} /index.html
+        
+        # Transform Markdown to HTML with syntax highlighting
+        markdown {
+            template /app/template.html
+            css /assets/markdown.css
+            js /assets/highlight.js
+        }
+    }
+}
